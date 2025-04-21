@@ -1,2 +1,2 @@
 # lesehan
-Menjual berbagai jenis makanan
+Menjual berbagai jenis bahan pangan
