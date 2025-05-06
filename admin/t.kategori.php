@@ -1,6 +1,25 @@
-<
 <?php
-include "koneksi.php";
+include 'koneksi.php';
+if (isset($_POST['simpan'])) {
+    $auto = mysqli_query($koneksi, "select max(id_ktg) as max_code from tb_kategori");
+    $hasil = mysqli_fetch_array($auto);
+    $code = $hasil['max_code'];
+    $urutan = (int) substr($code, 1, 3);
+    $urutan++;
+    $huruf = "K";
+    $id_ktg = $huruf . sprintf("%03s", $urutan);
+    $nm_ktg = $_POST['nm_ktg'];
+
+    $query = mysqli_query($koneksi, "insert into tb_kategori(id_ktg, nm_ktg) values ('$id_ktg','$nm_ktg')");
+        if ($query) {
+            echo "<script>alert('Data Berhasil Disimpan')</script>";
+            header("refresh:0; kategori.php");
+        } else {
+            echo "<script>alert('Data Gagal Disimpan')</script>";
+            header("refresh:0; kategori.php");
+        }   
+
+}
 ?>
 
 <!DOCTYPE html>
@@ -10,7 +29,7 @@ include "koneksi.php";
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Kategori Produk - Sembako Only</title>
+  <title>Kategori - Sembako Only Admin</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -49,29 +68,15 @@ include "koneksi.php";
   <header id="header" class="header fixed-top d-flex align-items-center">
 
     <div class="d-flex align-items-center justify-content-between">
-      <a href="index.php" class="logo d-flex align-items-center">
+      <a href="index.html" class="logo d-flex align-items-center">
         <img src="assets/img/logo.png" alt="">
-        <span class="d-none d-lg-block">sclothes</span>
+        <span class="d-none d-lg-block">Sembako Only</span>
       </a>
       <i class="bi bi-list toggle-sidebar-btn"></i>
     </div><!-- End Logo -->
 
-    <div class="search-bar">
-      <form class="search-form d-flex align-items-center" method="POST" action="">
-        <input type="text" name="query" placeholder="Search" title="Enter search keyword"
-          value="<?php echo isset($_POST['query']) ? htmlspecialchars($_POST['query']) : ''; ?>" />
-        <button type="submit" title="Search"><i class="bi bi-search"></i></button>
-      </form>
-    </div><!-- End Search Bar -->
-
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">
-
-        <li class="nav-item d-block d-lg-none">
-          <a class="nav-link nav-icon search-bar-toggle " href="#">
-            <i class="bi bi-search"></i>
-          </a>
-        </li><!-- End Search Icon-->
 
         <li class="nav-item dropdown pe-3">
 
@@ -82,8 +87,8 @@ include "koneksi.php";
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
-              <h6>M.narul </h6>
-              <span>Sembako Only</span>
+              <h6>Nrul Hidayah</h6>
+              <span>Web Designer</span>
             </li>
             <li>
               <hr class="dropdown-divider">
@@ -104,7 +109,6 @@ include "koneksi.php";
 
   </header><!-- End Header -->
 
-  <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
 
     <ul class="sidebar-nav" id="sidebar-nav">
@@ -169,87 +173,34 @@ include "koneksi.php";
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="index.php">Beranda</a></li>
-          <li class="breadcrumb-item active">Kategori</li>
+          <li class="breadcrumb-item">Kategori</li>
+          <li class="breadcrumb-item active">Tambah</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
-
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="card">
-          <div class="card-body">
-            <a href="t.kategori.php" class="btn btn-primary mt-3">
-              <i class="bi bi-plus-lg"></i> Tambah Kategori
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-
+    
     <section class="section">
       <div class="row">
-        <div class="col-lg-12">
+        <div class="col-lg-6">
           <div class="card">
             <div class="card-body">
-
-              <!-- Table with stripped rows -->
-              <table class="table table-striped mt-2">
-                <thead>
-                  <tr>
-                    <th scope="col">No</th>
-                    <th scope="col">Nama Kategori</th>
-                    <th scope="col">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                <?php
-                  include 'koneksi.php';
-                  $no = 1;
-
-                  $query = isset($_POST['query']) ? mysqli_real_escape_string($koneksi, $_POST['query']) : '';
-                  $sql_query = "SELECT id_ktg, nm_ktg FROM tb_kategori";
-
-                  if (!empty($query)) {
-                    $sql_query .= " WHERE nm_ktg LIKE '%$query%'";
-                  }
-
-                  $sql = mysqli_query($koneksi, $sql_query);
-
-                  if (!$sql) {
-                    die("Query error: " . mysqli_error($koneksi)); // <--- debug line
-                  }
-
-                  if (mysqli_num_rows($sql) > 0) {
-                    while ($hasil = mysqli_fetch_array($sql)) {
-                  ?>
-                      <tr>
-                        <td><?php echo $no++; ?></td>
-                        <td><?php echo $hasil['nm_ktg']; ?></td>
-                        <td>
-                          <a href="e.kategori.php?id=<?php echo $hasil["id_ktg"]; ?>" class="btn btn-warning">
-                            <i class="bi bi-pencil-square"> </i>
-                          </a>
-                          <a href="h.kategori.php?id=<?php echo $hasil["id_ktg"]; ?>" class="btn btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
-                            <i class="bi bi-trash"></i>
-                          </a>
-                        </td>
-                      </tr>
-                    <?php
-                    }
-                  } else {
-                    ?>
-                    <tr>
-                      <td colspan="3" class="text-center">Belum Ada Data</td>
-                    </tr>
-                  <?php
-                  }
-                  ?>
-                </tbody>
-              </table>
-              <!-- End Table with stripped rows -->
+              <!-- Vertical Form -->
+              <form class="row g-3 mt-2" method="post">
+                <div class="col-12">
+                  <label for="nm_ktg" class="form-label">Nama Kategori</label>
+                  <input type="text" class="form-control" name="nm_ktg" id="nm_ktg " placeholder="Masukkan Nama Kategori Produk">
+                </div>
+                <div class="text-center">
+                  <button type="reset" class="btn btn-secondary">Reset</button>
+                  <button type="submit" class="btn btn-primary" name="simpan">Simpan</button>
+                </div>
+              </form><!-- Vertical Form -->
 
             </div>
           </div>
+
+        </div>
+      </div>
     </section>
 
   </main><!-- End #main -->
